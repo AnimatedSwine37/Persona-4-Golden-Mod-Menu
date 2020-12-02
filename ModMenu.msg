@@ -10,6 +10,7 @@
 [f 0 5 -258][f 2 1]View calendar[e]
 [f 0 5 -258][f 2 1]Save[e]
 [f 0 5 -258][f 2 1]Mod menu[e]
+[f 0 5 -258][f 2 1]Options[e]
 [f 0 5 -258][f 2 1]Exit[e]
 
 [sel Square_Menu_Dng]
@@ -18,6 +19,7 @@
 [f 0 5 -258][f 2 1]View calendar[e]
 [f 0 5 -258][f 2 1]Save[e]
 [f 0 5 -258][f 2 1]Mod menu[e]
+[f 0 5 -258][f 2 1]Options[e]
 [f 0 5 -258][f 2 1]Exit[e]
 
 [msg Mod_Menu_Text]
@@ -111,6 +113,7 @@
 [sel Flag_Menu]
 [f 0 5 -258][f 2 1]Edit Flag[e]
 [f 0 5 -258][f 2 1]Mass Flag Edit[e]
+[f 0 5 -258][f 2 1]Toggle Menu Options[e]
 [f 0 5 -258][f 2 1]Go back...[e]
 
 [sel OnOff]

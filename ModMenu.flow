@@ -615,9 +615,25 @@ void Flag_Menu()
 				ToggleBitRange();
 				break;
 			case 2:
+				ToggleMenuOptions();
+				return;
+			case 3:
 				ModMenuDisplay();
 				return;
 		}
+	}
+}
+
+void ToggleMenuOptions()
+{
+	int toggle = SEL(OnOff);
+	if (toggle == 0)
+	{
+		BIT_ON(6429);
+	}
+	else
+	{
+		BIT_OFF(6429);
 	}
 }
 

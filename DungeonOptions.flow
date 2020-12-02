@@ -1,60 +1,100 @@
-
-// 
-// FlowScript decompiled by AtlusScriptLib by TGE (2017)
-// In the unfortunate case of any bugs, please report them back to me.
-// 
-
-
-// 
-// Imports
-// 
-
 import ("OrganizeParty.flow");
 import( "DungeonTravel.flow" );
 import( "GohoM.flow" );
 import( "Fox.flow" );
 
-// 
-// Script-level variable definitions
-// 
-
 // Menu hooks
 void entrance_jump_hook()
 {
-    int var29 = GET_FLOOR_ID();
-	int mask = 0;
-	if (EnableOrganizeParty() == false)
-		mask = mask + 4;
-	if (BeatDungeon() == false)
-		mask = mask + 2;
-    FUNCTION_0023( 0, 3 );
-    SET_SEL_CHOICE_KEYBIND( 14, 3 );
-    int var27 = ADV_SEL( 15, ENTRANCE_SEL_HOOK, mask );
-    
-    if ( var27 == 0 )
-    {
-        
-        if ( GET_MONTH() == 4 && GET_DAY_OF_MONTH() == 17 )
-        {
-            OPEN_MSG_WIN();
-            MSG( STOP_RETURN_ENTRANCE );
-            CLOSE_MSG_WIN();
-        }
-        else 
-        {
-            return_tv_studio();
-        }
+	int var29 = GET_FLOOR_ID();
+	int var27 = 0;
+	//If DungeonOptions enabled
+	if (!BIT_CHK(6424))
+	{
+		int mask = 0;
+		if (EnableOrganizeParty() == false)
+			mask = mask + 4;
+		if (BeatDungeon() == false)
+			mask = mask + 2;
+		FUNCTION_0023( 0, 3 );
+		SET_SEL_CHOICE_KEYBIND( 14, 3 );
+		var27 = ADV_SEL( 15, ENTRANCE_SEL_HOOK, mask );
+		
+		if ( var27 == 0 )
+		{
+			
+			if ( GET_MONTH() == 4 && GET_DAY_OF_MONTH() == 17 )
+			{
+				OPEN_MSG_WIN();
+				MSG( STOP_RETURN_ENTRANCE );
+				CLOSE_MSG_WIN();
+			}
+			else 
+			{
+				return_tv_studio();
+			}
 
-    }
-    else if ( var27 == 1 )
-    {
-		SelectFloor();
-    }
-	else if ( var27 == 2 )
-    {
-		OrganizeParty();
-    }
-
+		}
+		else if ( var27 == 1 )
+		{
+			SelectFloor();
+		}
+		else if ( var27 == 2 )
+		{
+			OrganizeParty();
+		}
+	}
+	else
+	{
+		//Original Functionality
+		int var28 = 0;
+		if ( BIT_CHK( 0 + 0x0400 + 0x0800 + 0 ) == 0 )
+		{
+			var28 = 4;
+		}
+		FUNCTION_0023( 0, 3 );
+		SET_SEL_CHOICE_KEYBIND( 14, 1 );
+		var27 = ADV_SEL( 15, 14, var28 );
+		if ( var27 == 0 )
+		{
+			if ( GET_MONTH() == 4 && GET_DAY_OF_MONTH() == 17 )
+			{
+				OPEN_MSG_WIN();
+				MSG( STOP_RETURN_ENTRANCE );
+				CLOSE_MSG_WIN();
+			}
+			else 
+			{
+				return_tv_studio();
+			}
+		}
+		else if ( var27 == 2 )
+		{
+			OPEN_MSG_WIN();
+			
+			if ( GET_CNT( 0 ) == 0 )
+			{
+				MSG( DEBUG_FLOOR_JUMP_HELP );
+				CLOSE_MSG_WIN();
+			}
+			else 
+			{
+				SET_MSG_VAR( 0, GET_CNT( 0 ), 0 );
+				MSG( DEBUG_FLOOR_JUMP );
+				SET_SEL_CHOICE_KEYBIND( 14, 1 );
+				var27 = SEL( YESNO_SEL );
+				CLOSE_MSG_WIN();
+				if ( var27 == 1 )
+				{
+					return;
+				}
+				dng_set_npc();
+				FADE( 1, 10 );
+				FADE_SYNC();
+				CALL_FLOOR( GET_CNT( 0 ) );
+			}
+		}
+	}
 }
 
 // Called mid dungeon
@@ -96,8 +136,17 @@ void helper_order_hook()
 		SET_MSG_VAR(1, GET_ITEM(790), 0);
 		// Sets mask
         SET_MASK( sVar1 );
-        SET_SEL_CHOICE_KEYBIND( 14, 11 );
-        var33 = SEL( DUNGEON_SEL_HOOK );
+		//If DungeonOptions enabled
+		if (BIT_CHK(6424))
+		{
+			SET_SEL_CHOICE_KEYBIND( 14, 11 );
+			var33 = SEL( DUNGEON_SEL_HOOK );
+		}
+		else
+		{
+			SET_SEL_CHOICE_KEYBIND( 14, 7 );
+			var33 = SEL( DUNGEON_SEL );
+		}
 		
         if ( var33 == 0 )
         {
@@ -167,16 +216,29 @@ void helper_order_hook()
 		// Select dungeon floor
         else if ( var33 == 7 )
         {
-			CLOSE_MSG_WIN();
-			NAVI_BU_CLOSE( sVar7 );
-			SelectFloor();
+			//If DungeonOptions enabled
+			if(BIT_CHK(6424))
+			{
+				CLOSE_MSG_WIN();
+				NAVI_BU_CLOSE( sVar7 );
+				SelectFloor();
+			}
             goto _101;
         }
 		else if ( var33 == 8 )
 		{
 			CLOSE_MSG_WIN();
 			NAVI_BU_CLOSE( sVar7 );
-			OrganizeParty();
+			//If DungeonOptions enabled
+			if(BIT_CHK(6424))
+			{
+				OrganizeParty();
+			}
+			else
+			{
+				//Original Functionality
+				debug_floor_jump();
+			}
             goto _101;
 		}
 		else if ( var33 == 9 )
@@ -185,17 +247,21 @@ void helper_order_hook()
 			use_gohom();
             goto _101;
 		}
-		else if ( var33 == 10 )
-		{
-			CLOSE_MSG_WIN();
-			NAVI_BU_CLOSE( sVar7 );
-			use_fox();
-            goto _101;
-		}
-		else if ( var33 == 11 ) 
+		else if ( var33 == 10 ) 
         {
+			//If DungeonOptions enabled
+			if(BIT_CHK(6424))
+			{
+				CLOSE_MSG_WIN();
+				NAVI_BU_CLOSE( sVar7 );
+				use_fox();
+			}
 			goto _101;
         }
+		else if ( var33 == 11 )
+		{
+			goto _101;
+		}
 		
         goto _100;
     }
@@ -212,7 +278,12 @@ void helper_order_hook()
 
 void init_sel_mask_hook()
 {
-	bool showFloorSelect = BeatDungeon();
+	bool showFloorSelect = false;
+	//If DungeonOptions enabled
+	if(BIT_CHK(6424))
+	{
+		showFloorSelect = BeatDungeon();
+	}
     int var34 = GET_FLOOR_ID();
     sVar0 = 0;
     sVar2 = 63;
@@ -294,129 +365,236 @@ void init_sel_mask_hook()
         }
 
     }
-
-    // Hide Go to next floor if floor select is shown
-    if ( FLD_FUNCTION_0036() == 0 || showFloorSelect == true)
-    {
-        sVar1 = sVar1 + 0x10;
-    }
-
-    sVar1 = sVar1 + 96;
-    
-	// Keep Return to previous floor/entrance hidden if floor select is shown
-    if ( FLD_FUNCTION_0037() == 1 && showFloorSelect == false)
-    {
-        
-        if ( var34 == 6 || var34 == 21 || var34 == 41 || var34 == 61 || var34 == 81 || var34 == 101 || var34 == 121 || var34 == 123 || var34 == 141 || var34 == 161 )
-        {
-            sVar1 = sVar1 - 0x40;
-        }
-        else 
-        {
-            sVar1 = sVar1 - 0x20;
-        }
-
-    }
 	
-	// Hide floor select
-	if (showFloorSelect == false)
-		sVar1 = sVar1 + 0x80;
+	// Hide Go to next floor if floor select is shown
+	if ( FLD_FUNCTION_0036() == 0 || showFloorSelect == true)
+	{
+		sVar1 = sVar1 + 0x10;
+	}
+
+	sVar1 = sVar1 + 96;
+	
+	// Keep Return to previous floor/entrance hidden if floor select is shown
+	if ( FLD_FUNCTION_0037() == 1 && showFloorSelect == false)
+	{
+		
+		if ( var34 == 6 || var34 == 21 || var34 == 41 || var34 == 61 || var34 == 81 || var34 == 101 || var34 == 121 || var34 == 123 || var34 == 141 || var34 == 161 )
+		{
+			sVar1 = sVar1 - 0x40;
+		}
+		else 
+		{
+			sVar1 = sVar1 - 0x20;
+		}
+
+	}
+	
+	//If DungeonOptions enabled
+	if(BIT_CHK(6424))
+	{
+		// Hide floor select
+		if (showFloorSelect == false)
+			sVar1 = sVar1 + 0x80;
+		else
+			sVar1 = sVar1 + 0x200;
+		if (EnableOrganizeParty() == false)
+			sVar1 = sVar1 + 0x100;
+		if ( BIT_CHK( 0 + 0x0400 + 0x0800 + 9 ) == 0 )
+			sVar1 = sVar1 + 0x400;
+	}
 	else
-		sVar1 = sVar1 + 0x200;
-	if (EnableOrganizeParty() == false)
-		sVar1 = sVar1 + 0x100;
-	if ( BIT_CHK( 0 + 0x0400 + 0x0800 + 9 ) == 0 )
-		sVar1 = sVar1 + 0x400;
+	{
+		//Original Functionality
+		if ( FLD_FUNCTION_0036() == 0 )
+		{
+			sVar1 = sVar1 + 0x10;
+		}
+		sVar1 = sVar1 + 96;
+		if ( FLD_FUNCTION_0037() == 1 )
+		{
+			if ( var34 == 6 || var34 == 21 || var34 == 41 || var34 == 61 || var34 == 81 || var34 == 101 || var34 == 121 || var34 == 123 || var34 == 141 || var34 == 161 )
+			{
+				sVar1 = sVar1 - 0x40;
+			}
+			else 
+			{
+				sVar1 = sVar1 - 0x20;
+			}
+		}
+		if ( BIT_CHK( 0 + 0x0400 + 0x0800 + 0 ) == 0 )
+		{
+			sVar1 = sVar1 + 0x0100;
+		}
+	}
 }
 
 void tomb_jump_hook()
 {
+	int var23 = 0;
     int var24 = 0;
     int var25 = 0;
-    var24 = var24 + 1 + 4 + 8;
-    var24 = var24 + 0x20;
-	if (EnableOrganizeParty() == false)
-		var24 = var24 + 2;
-    FUNCTION_0023( 0, 3 );
-    SET_SEL_CHOICE_KEYBIND( 14, 6 );
-    int var23 = ADV_SEL( 12, TOMB_SEL_HOOK, var24 );
-    
-    if ( var23 == 0 || var23 == 2 || var23 == 3 || var23 == 4 )
-    {
-        FADE( 1, 10 );
-        
-        if ( var23 == 4 )
-        {
-            FUNCTION_0024( 255, 255, 255 );
-        }
+	FUNCTION_0023( 0, 3 );
+	//If DungeonOptions enabled
+	if(BIT_CHK(6424))
+	{
+		var24 = var24 + 1 + 4 + 8;
+		var24 = var24 + 0x20;
+		if (EnableOrganizeParty() == false)
+			var24 = var24 + 2;
+		SET_SEL_CHOICE_KEYBIND( 14, 6 );
+		var23 = ADV_SEL( 12, TOMB_SEL_HOOK, var24 );
+		if ( var23 == 0 || var23 == 2 || var23 == 3 || var23 == 4 )
+		{
+			FADE( 1, 10 );
+			
+			if ( var23 == 4 )
+			{
+				FUNCTION_0024( 255, 255, 255 );
+			}
 
-        FADE_SYNC();
-        FLD_FUNCTION_0024();
-        
-        if ( var23 == 0 )
-        {
-            BIT_OFF( 0 + 0x0400 + 0x0800 + 2 );
-            CALL_DUNGEON( 1, 0 );
-            return;
-        }
-        else if ( var23 == 2 )
-        {
-            DAIDARA_SHOP();
-        }
-        else if ( var23 == 3 )
-        {
-            SHIROKU_SHOP();
-        }
-        else if ( var23 == 4 )
-        {
-            var25 = 3;
-            VELVET_ROOM();
-            BIT_OFF( 0 + 0x0400 + 719 );
-        }
+			FADE_SYNC();
+			FLD_FUNCTION_0024();
+			
+			if ( var23 == 0 )
+			{
+				BIT_OFF( 0 + 0x0400 + 0x0800 + 2 );
+				CALL_DUNGEON( 1, 0 );
+				return;
+			}
+			else if ( var23 == 2 )
+			{
+				DAIDARA_SHOP();
+			}
+			else if ( var23 == 3 )
+			{
+				SHIROKU_SHOP();
+			}
+			else if ( var23 == 4 )
+			{
+				var25 = 3;
+				VELVET_ROOM();
+				BIT_OFF( 0 + 0x0400 + 719 );
+			}
 
-        CALL_DUNGEON( 160, var25 );
-    }
-    else if ( var23 == 5 )
-    {
-        OPEN_MSG_WIN();
-        MSG( RETURN_HOME_OK );
-        SET_SEL_CHOICE_KEYBIND( 14, 1 );
-        var23 = SEL( YESNO_SEL );
-        CLOSE_MSG_WIN();
-        
-        if ( var23 == 0 )
-        {
-            OPEN_MSG_WIN();
-            MSG( KUMA_BYE_TOMB );
-            CLOSE_MSG_WIN();
-            FADE( 1, 10 );
-            FADE_SYNC();
-            out_tv_world();
-            return;
-        }
+			CALL_DUNGEON( 160, var25 );
+		}
+		else if ( var23 == 5 )
+		{
+			OPEN_MSG_WIN();
+			MSG( RETURN_HOME_OK );
+			SET_SEL_CHOICE_KEYBIND( 14, 1 );
+			var23 = SEL( YESNO_SEL );
+			CLOSE_MSG_WIN();
+			
+			if ( var23 == 0 )
+			{
+				OPEN_MSG_WIN();
+				MSG( KUMA_BYE_TOMB );
+				CLOSE_MSG_WIN();
+				FADE( 1, 10 );
+				FADE_SYNC();
+				out_tv_world();
+				return;
+			}
 
-    }
-	else if ( var23 == 1 )
-    {
-		OrganizeParty();
-    }
+		}
+		else if ( var23 == 1 )
+		{
+			OrganizeParty();
+		}
+	}
+	else
+	{
+		//Original Functionality
+		var24 = var24 + 1 + 2 + 4;
+		var24 = var24 + 0x10;
+		FUNCTION_0023( 0, 3 );
+		SET_SEL_CHOICE_KEYBIND( 14, 5 );
+		var23 = ADV_SEL( 12, 11, var24 );
+		if ( var23 == 0 || var23 == 1 || var23 == 2 || var23 == 3 )
+		{
+			FADE( 1, 10 );
+			
+			if ( var23 == 3 )
+			{
+				FUNCTION_0024( 255, 255, 255 );
+			}
 
+			FADE_SYNC();
+			FLD_FUNCTION_0024();
+			
+			if ( var23 == 0 )
+			{
+				BIT_OFF( 0 + 0x0400 + 0x0800 + 2 );
+				CALL_DUNGEON( 1, 0 );
+				return;
+			}
+			else if ( var23 == 1 )
+			{
+				DAIDARA_SHOP();
+			}
+			else if ( var23 == 2 )
+			{
+				SHIROKU_SHOP();
+			}
+			else if ( var23 == 3 )
+			{
+				var25 = 3;
+				VELVET_ROOM();
+				BIT_OFF( 0 + 0x0400 + 719 );
+			}
+
+			CALL_DUNGEON( 160, var25 );
+		}
+		else if ( var23 == 4 )
+		{
+			OPEN_MSG_WIN();
+			MSG( RETURN_HOME_OK );
+			SET_SEL_CHOICE_KEYBIND( 14, 1 );
+			var23 = SEL( YESNO_SEL );
+			CLOSE_MSG_WIN();
+			
+			if ( var23 == 0 )
+			{
+				OPEN_MSG_WIN();
+				MSG( KUMA_BYE_TOMB );
+				CLOSE_MSG_WIN();
+				FADE( 1, 10 );
+				FADE_SYNC();
+				out_tv_world();
+				return;
+			}
+		}
+	}
 }
 
 void liqueur_jump_hook()
 {
-    FUNCTION_0023( 0, 3 );
-	int mask = 0;
-	if (EnableOrganizeParty() == false)
-		mask = mask + 2;
-    SET_SEL_CHOICE_KEYBIND( 14, 1 );
-    int var26 = ADV_SEL( 15, LIQUEUR_SEL_HOOK, mask );
-    
-    if ( var26 == 0 )
-    {
-        return_tv_studio();
-    }
-	else if (var26 == 1)
-		OrganizeParty();
+	FUNCTION_0023( 0, 3 );
+	SET_SEL_CHOICE_KEYBIND( 14, 1 );
+	//If DungeonOptions enabled
+	if(BIT_CHK(6424))
+	{
+		int mask = 0;
+		if (EnableOrganizeParty() == false)
+			mask = mask + 2;
+		
+		int var26 = ADV_SEL( 15, LIQUEUR_SEL_HOOK, mask );
 
+		if ( var26 == 0 )
+		{
+			return_tv_studio();
+		}
+		else if (var26 == 1)
+			OrganizeParty();
+	}
+	else
+	{
+		//Original Functionality
+		int var26 = ADV_SEL( 15, 13, 0 );
+		if ( var26 == 0 )
+		{
+			return_tv_studio();
+		}
+	}
 }
